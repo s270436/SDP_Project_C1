@@ -1,0 +1,3 @@
+toolbuild.tgz
+**/tools/*
+os161-base-2.0.2/kern/compile/*
