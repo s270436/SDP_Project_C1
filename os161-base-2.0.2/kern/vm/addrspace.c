@@ -427,7 +427,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 		if (faultaddress >= vbase1 && faultaddress < vtop1) {
 			// Code segment
 
-			if(as->allocated_pages == MAX_ALLOCATED_PAGES || getppages(1) == 0) { 
+			if(as->allocated_pages == MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
 
                 index_page_to_replace = page_table_replacement(pid, &empty_entry); // find index victim to replace
 				index_tlb = page_table_get_Status_on_Index(index_page_to_replace);
@@ -486,7 +486,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 		}
 		else if (faultaddress >= vbase2 && faultaddress < vtop2) {
 			// Data segment
-			if(as->allocated_pages == MAX_ALLOCATED_PAGES || getppages(1) == 0) { 
+			if(as->allocated_pages == MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
 
                 index_page_to_replace = page_table_replacement(pid, &empty_entry); // find index victim to replace
 				index_tlb = page_table_get_Status_on_Index(index_page_to_replace);
@@ -545,7 +545,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 		}
 		else if (faultaddress >= stackbase && faultaddress < stacktop) {
 			// Stack 
-			if(as->allocated_pages == MAX_ALLOCATED_PAGES || getppages(1) == 0) { 
+			if(as->allocated_pages == MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
 
                 index_page_to_replace = page_table_replacement(pid, &empty_entry); // find index victim to replace
 				index_tlb = page_table_get_Status_on_Index(index_page_to_replace);

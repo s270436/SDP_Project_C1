@@ -33,7 +33,7 @@ options sfs			# Always use the file system
 
 options syscalls
 
-options synch
+#options synch
 
 options waitpid
 options fork
