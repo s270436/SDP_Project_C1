@@ -336,14 +336,14 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 	    case VM_FAULT_READONLY:
 		/* We always create pages read-write, so we can't get this */
 			as_destroy(proc_getas());
-			panic("dumbvm: got VM_FAULT_READONLY\n");
+			thread_exit();
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
 			// Count the fault that has happened
 			increment_tlb_faults();
-		break;
+			break;
 	    default:
-		return EINVAL;
+			return EINVAL;
 	}
 
 	if (curproc == NULL) {
@@ -385,7 +385,6 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 	KASSERT(as->as_npages1 != 0);
 	KASSERT(as->as_vbase2 != 0);
 	KASSERT(as->as_npages2 != 0);
-	//KASSERT(as->as_stackpbase != 0);
 	KASSERT((as->as_vbase1 & PAGE_FRAME) == as->as_vbase1);
 	KASSERT((as->as_vbase2 & PAGE_FRAME) == as->as_vbase2);
 	KASSERT((as->as_stackpbase & PAGE_FRAME) == as->as_stackpbase);
@@ -407,9 +406,9 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 	entry_t empty_entry;
 	int index_page_to_replace;
 
-	uint32_t status;
+	uint32_t status = 0;
 
-	int result = -1;
+	int result;
 
 	if(page_table_get_paddr_entry(pid, faultaddress, &paddr_temp, &status) == 1){
 		// 1 means found
@@ -427,7 +426,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 		if (faultaddress >= vbase1 && faultaddress < vtop1) {
 			// Code segment
 
-			if(as->allocated_pages == MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
+			if(as->allocated_pages >= MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
 
                 index_page_to_replace = page_table_replacement(pid, &empty_entry); // find index victim to replace
 				index_tlb = page_table_get_Status_on_Index(index_page_to_replace);
@@ -481,12 +480,12 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 				status |= index_tlb<<2;
 			page_table_add_entry(faultaddress, paddr, pid, status);
 
-			if (result < 0)
-				return -1;
+			if (result < 0) {}
+				//return -1;
 		}
 		else if (faultaddress >= vbase2 && faultaddress < vtop2) {
 			// Data segment
-			if(as->allocated_pages == MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
+			if(as->allocated_pages >= MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
 
                 index_page_to_replace = page_table_replacement(pid, &empty_entry); // find index victim to replace
 				index_tlb = page_table_get_Status_on_Index(index_page_to_replace);
@@ -535,17 +534,16 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 			increment_page_faults_disk();
 			increment_page_faults_elf();
 
-			status = 0x01; //READONLY
 			if (index_tlb != -1)
 				status |= index_tlb<<2;
 			page_table_add_entry(faultaddress, paddr, pid, status);
 
-			if (result < 0)
-				return -1;
+			if (result < 0){}
+				//return -1;
 		}
 		else if (faultaddress >= stackbase && faultaddress < stacktop) {
 			// Stack 
-			if(as->allocated_pages == MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
+			if(as->allocated_pages >= MAX_ALLOCATED_PAGES || (paddr = getppages(1)) == 0) { 
 
                 index_page_to_replace = page_table_replacement(pid, &empty_entry); // find index victim to replace
 				index_tlb = page_table_get_Status_on_Index(index_page_to_replace);
@@ -568,13 +566,12 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
             // clean the page just got by allocation (or previously swapped)
             as_zero_region(paddr, 1); 
 
-			status = 0x01; //READONLY
 			if (index_tlb != -1)
 				status |= index_tlb<<2;
 			page_table_add_entry(faultaddress, paddr, pid, status);
 
-			if (result < 0)
-				return -1;
+			if (result < 0){}
+				//return -1;
 
 		}
 		else {
@@ -586,9 +583,7 @@ int vm_fault(int faulttype, vaddr_t faultaddress) { //the goal of this function 
 	KASSERT((paddr & PAGE_FRAME) == paddr);
 	
 	ehi = faultaddress | pid << 6;
-	elo = paddr | TLBLO_VALID | TLBLO_GLOBAL;
-	if ((status & 0x01) != 0x01) //se non è settato l'ultimo bit allora la pagina è modificabile
-		elo |= TLBLO_DIRTY; //page is modifiable
+	elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
 	
 	// Write a new entry inside the TLB
 	add_entry(&index_tlb, ehi, elo);

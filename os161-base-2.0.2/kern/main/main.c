@@ -49,7 +49,6 @@
 #include <syscall.h>
 #include <test.h>
 #include <version.h>
-//#include "opt-dumbvm.h"
 #include "opt-projectc1.h"
 #include "autoconf.h"  // for pseudoconfig
 #include "swapfile.h"

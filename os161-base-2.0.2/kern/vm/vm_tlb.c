@@ -30,7 +30,8 @@ void write_entry(int index, uint32_t vaddr_no_offset_with_pid, uint32_t paddr_wi
     tlb_write(vaddr_no_offset_with_pid, paddr_with_flags, index); //set to 0 the last 8 bits
 }
 
-// This function just add a new entry in tlb table if there's an empty slot, otherwise replace any entry without taking into account the index
+// This function just add a new entry in tlb table if there's an empty slot, otherwise replace any entry without 
+// taking into account the index
 void add_entry(int *index_tlb, uint32_t vaddr_no_offset_with_pid, uint32_t paddr_with_flags) {
     int index;
     
