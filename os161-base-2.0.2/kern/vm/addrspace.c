@@ -107,7 +107,7 @@ static void vm_can_sleep(void){
 }
 
 /* Allocate/free some kernel-space virtual pages */
-vaddr_t alloc_kpages(unsigned npages){ //(copiate da dumbvm.c)
+vaddr_t alloc_kpages(unsigned npages){ 
 	
 	paddr_t pa;
 
@@ -120,7 +120,7 @@ vaddr_t alloc_kpages(unsigned npages){ //(copiate da dumbvm.c)
 }
 
 void
-free_kpages(vaddr_t addr){ //(copiate da dumbvm.c)
+free_kpages(vaddr_t addr){
 	if (isTableActive()) {
 		paddr_t paddr = addr - MIPS_KSEG0;
 		freeppages(paddr);
@@ -177,9 +177,9 @@ void as_destroy(struct addrspace *as) {
 	  Close the vnode associated to the addrspace
 	  Free the previously allocated addrspace
 	*/
-	// vm_can_sleep();
+	//vm_can_sleep();
 	page_table_remove_on_pids(curproc->pid);
-	// vfs_close(as->fi.v);
+	//vfs_close(as->fi.v);
 
 	kfree(as);
 }
@@ -218,7 +218,7 @@ int
 as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz,
 					off_t offset, int readable, int writeable, int executable)
 {
-	/*partially copied by dumbvm.c*/
+	/*partially from by dumbvm.c*/
 
 	size_t npages;
 	size_t sz2 = sz;

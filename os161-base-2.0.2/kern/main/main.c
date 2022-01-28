@@ -164,7 +164,6 @@ shutdown(void)
 #if OPT_PROJECTC1
 	print_all_statistics();
 	coremap_destroy();
-	page_table_destroy();
 	swap_destroy();
 #endif
 

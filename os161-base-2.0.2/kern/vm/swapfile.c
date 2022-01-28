@@ -16,8 +16,8 @@
 #include "pt.h"
 #include <vm_stats.h>
 
-#define FILESIZE 9437184 //9 * 2^20
-#define NUMBERENTRIES FILESIZE/PAGE_SIZE //9 * 2^20 / PAGE_SIZE 
+#define FILESIZE 9437184 // 9 * 1024 * 1024 (9 MB)
+#define NUMBERENTRIES FILESIZE/PAGE_SIZE // (9 * 1024 * 1024) / PAGE_SIZE = 2304
 #define FILENAME "emu0:SWAPFILE" //emu0 is the default secondary memory
 
 typedef struct swap_track {
@@ -50,8 +50,6 @@ void swap_bootstrap(void) {
     if((err = vfs_open(path, O_CREAT | O_RDWR, 0, &swap_vnode))) { //open file 
         panic("[ERR] swapfile.c: error %d opening swapfile %s\n", err, FILENAME);
     }
-
-    
 
     VOP_STAT(swap_vnode, &info_file); //get information of the file and store it into the stat variable
     if(info_file.st_size < FILESIZE) {

@@ -4,7 +4,6 @@
 #include <pt.h>
 #include <vm.h>
 #include <coremap.h>
-#include <types.h>
 
 static table_t * page_table;
 
@@ -24,6 +23,7 @@ void lru_update_cnt(void){
 void page_table_init(void) {
 
     unsigned int length = ram_getsize()/PAGE_SIZE;
+    unsigned int i = 0;
 
     page_table = kmalloc(sizeof(table_t));
     if(page_table == NULL) 
@@ -37,8 +37,6 @@ void page_table_init(void) {
     
     spinlock_init(&page_table->table_lock);
 
-    unsigned int i = 0;
-    
     spinlock_acquire(&page_table->table_lock);
     for(i=0; i<length; i++){
         page_table->next_entry[i].pid = -1;
@@ -155,9 +153,10 @@ void page_table_remove_on_pids(pid_t pid){
 
 void page_table_destroy(void) {
     unsigned int i = 0;
-    spinlock_acquire(&page_table->table_lock);
-    for(i=0; i<page_table->length; i++) {
-        kfree(&page_table->next_entry[i]);
+    unsigned int len = page_table->length;
+    spinlock_acquire(&page_table->table_lock);    
+    for(i=0; i < len; i++) {
+        kfree((void*)&page_table->next_entry[i]);
     }
     spinlock_release(&page_table->table_lock);
     kfree(page_table);

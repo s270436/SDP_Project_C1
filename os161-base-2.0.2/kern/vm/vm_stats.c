@@ -85,4 +85,12 @@ extern void increment_swapfile_writes(void) {
 
 extern void print_all_statistics(void) {
     kprintf("STATISTICS:\ntlb_faults=%d, tlb_faults_free=%d, tlb_faults_replace=%d, tlb_invalidations=%d, tlb_reloads=%d, page_faults_zeroed=%d, page_faults_disk=%d, page_faults_elf=%d, page_faults_swapin=%d, page_faults_swapout=%d, swapfile_writes=%d\n", tlb_faults, tlb_faults_free, tlb_faults_replace, tlb_invalidations, tlb_reloads, page_faults_zeroed, page_faults_disk, page_faults_elf, page_faults_swapin, page_faults_swapout, swapfile_writes);
+    if( (tlb_faults_free + tlb_faults_replace) != tlb_faults)
+        kprintf("Warning: TLB FAULTS with Free + TLB Faults with Replace is NOT equal to TLB Faults\n");
+    
+    if( (tlb_reloads + page_faults_disk + page_faults_zeroed) != tlb_faults)
+        kprintf("Warning: TLB reloads + PF Disk + PF Zeroed is NOT equal to TLB Faults\n");
+
+    if ((page_faults_elf + page_faults_swapin + page_faults_swapout) != page_faults_disk)
+        kprintf("Warning: PF from ELF + PF from Swapfile is NOT equal to PF Disk\n");
 }
