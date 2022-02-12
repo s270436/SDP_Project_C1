@@ -179,6 +179,7 @@ void as_destroy(struct addrspace *as) {
 	*/
 	//vm_can_sleep();
 	page_table_remove_on_pids(curproc->pid);
+	swap_remove_pid(curproc->pid);
 	//vfs_close(as->fi.v);
 
 	kfree(as);

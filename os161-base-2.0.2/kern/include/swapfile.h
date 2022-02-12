@@ -14,6 +14,8 @@ void swap_out(pid_t pid, vaddr_t vaddr, permission_t permission_flag, paddr_t pa
 
 int swap_in(struct addrspace *as, pid_t pid, vaddr_t vaddr, paddr_t *paddr);
 
+void swap_remove_pid(pid_t pid);
+
 void swap_destroy(void);
 
 #endif

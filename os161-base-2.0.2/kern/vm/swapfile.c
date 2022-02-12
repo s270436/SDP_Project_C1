@@ -168,6 +168,17 @@ int swap_in(struct addrspace *as, pid_t pid, vaddr_t vaddr, paddr_t *paddr) { //
     return 1;
 }
 
+void swap_remove_pid(pid_t pid)
+{
+    int i;
+    for(i=0; i<NUMBERENTRIES; i++) {
+        if(track[i].pid == pid && track[i].valid == 1) {
+            track[i].pid = -1;
+            track[i].valid = 0;
+        }
+    }
+}
+
 void swap_destroy(void)
 {
 	spinlock_cleanup(&slock);
